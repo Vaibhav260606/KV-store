@@ -4,9 +4,9 @@ A Redis-inspired in-memory key-value database built entirely from scratch in **C
 
 KVStore is a lightweight database server that supports concurrent TCP clients, custom hash-table storage, persistence, key expiration, and LRU-based eviction—implemented without relying on STL hash maps or external networking frameworks.
 
-> **Goal:** Learn systems programming by implementing the core building blocks of a database server from first principles.
+Repo Link: https://github.com/Vaibhav260606/KV-store
 
-Repo Link : https://github.com/Vaibhav260606/KV-store
+> **Goal:** Learn systems programming by implementing the core building blocks of a database server from first principles.
 ---
 
 # Features
