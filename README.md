@@ -1,4 +1,4 @@
-# KVStore 🗄️
+# KVStore 
 
 A Redis-inspired in-memory key-value database built entirely from scratch in **C++**.
 
