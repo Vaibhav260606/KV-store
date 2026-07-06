@@ -23,6 +23,8 @@ public:
     bool exists(const std::string& key) const;
     void remove(const std::string& key);
     void print() const;
+    void saveToFile(const std::string& filename) const;
+    void loadFromFile(const std::string& filename);
 
 private:
     std::vector<Node*> buckets;

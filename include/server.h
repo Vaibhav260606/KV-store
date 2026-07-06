@@ -3,6 +3,8 @@
 
 #include "hashtable.h"
 #include <netinet/in.h>
+#include <mutex>
+#include <thread>
 
 class Server {
 public:
@@ -22,7 +24,11 @@ private:
 
     sockaddr_in serverAddress;
 
+    static constexpr const char* SNAPSHOT_FILE = "snapshot.db";
+
     HashTable table;
+
+    std::mutex tableMutex;
 };
 
 #endif

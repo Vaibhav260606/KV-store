@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <string>
 #include <sstream>
+#include <thread>
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -13,6 +14,7 @@
 Server::Server(int port) {
     this->port = port;
     this->serverSocket = -1;
+    table.loadFromFile(SNAPSHOT_FILE);
 }
 
 void Server::start() {
@@ -77,15 +79,19 @@ void Server::listenForConnections() {
             continue;
         }
 
-        std::cout << "Client connected!\n";
+        std::cout << "Client connected from " << inet_ntoa(clientAddress.sin_addr) << ":" << ntohs(clientAddress.sin_port) << std::endl;
 
-        handleClient(clientSocket);
+        std::thread clientThread(&Server::handleClient, this, clientSocket);
+
+        clientThread.detach();
     }
 }
 
 void Server::handleClient(int clientSocket) {
+    int buffer_size = 1024;
+
     while(true) {
-        char buffer[1024];
+        char buffer[buffer_size];
 
         int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
 
@@ -135,11 +141,14 @@ std::string Server::processCommand(const std::string& command) {
     }
     else if(operation == "SET") {
         ss >> key >> value;
+        std::lock_guard<std::mutex> lock(tableMutex);
         table.set(key, value);
+        table.saveToFile("snapshot.db");
         response = "OK";
     }
     else if(operation == "GET") {
         ss >> key;
+        std::lock_guard<std::mutex> lock(tableMutex);
         std::string retrievedValue = table.get(key);
             
         if(!retrievedValue.empty()) {
@@ -155,7 +164,9 @@ std::string Server::processCommand(const std::string& command) {
     }
     else if(operation == "DEL") {
         ss >> key;
+        std::lock_guard<std::mutex> lock(tableMutex);
         table.remove(key);
+        table.saveToFile("snapshot.db");
         response = "Deleted";
     }
     else {

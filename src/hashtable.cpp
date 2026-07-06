@@ -1,6 +1,8 @@
 #include "../include/hashtable.h"
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 Node::Node(const std::string& key, const std::string& value) {
     this->key = key;
@@ -175,4 +177,41 @@ void HashTable::rehash() {
     // Replace old bucket array
     buckets = std::move(newBuckets);
     capacity = newCapacity;
+}
+
+void HashTable::saveToFile(const std::string& filename) const {
+    std::ofstream file(filename);
+
+    if(!file.is_open()) {
+        std::cerr << "Could not open file\n";
+        return;
+    }
+
+    // Traverse every bucket
+    for(size_t i = 0; i < capacity; i++) {
+        Node* current = buckets[i];
+
+        while(current != nullptr) {
+            file << current->key << " " << current->value << "\n";
+            current = current->next;
+        }
+    }
+
+    std::cout << "Snapshot saved successfully.\n";
+}
+
+void HashTable::loadFromFile(const std::string& filename)
+{
+    std::ifstream file(filename);
+
+    if(!file.is_open()) {
+        return;
+    }
+
+    std::string key;
+    std::string value;
+
+    while(file >> key >> value) {
+        set(key, value);
+    }
 }
